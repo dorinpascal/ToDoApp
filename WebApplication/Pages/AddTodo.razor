@@ -1,0 +1,40 @@
+﻿@page "/AddTodo"
+
+@using Lesson4.Models
+@using Lesson4.Data
+@inject ITodoData TodoData
+@inject NavigationManager _navigationManager;
+<h1>AddTodo</h1>
+
+<EditForm Model="@newToDoItem" OnValidSubmit="@AddNewTodo">
+   <DataAnnotationsValidator/> 
+       <ValidationSummary/>
+          <div class="form-group">
+            User Id:<br/>
+                  <InputNumber @bind-Value="newToDoItem.UserId"/>
+                    </div>
+                       <div class="form-group">
+                            Title:<br/>
+                         <InputTextArea rows="4" @bind-Value="newToDoItem.Title"/>
+                           </div>    <p class="actions">
+                                  <button class="btn btn-outline-dark" type="submit">Create</button>
+                                    </p>
+                                    </EditForm>
+
+
+
+@code {
+private ToDo newToDoItem=new ToDo();
+
+private void AddNewTodo()
+{
+   TodoData.AddTodo(newToDoItem);
+    _navigationManager.NavigateTo("/Todos");
+}
+
+
+
+
+
+    
+}
