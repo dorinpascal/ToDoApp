@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Lesson4.Models
+namespace WebApplication
 {
     
     

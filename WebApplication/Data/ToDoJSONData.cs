@@ -2,9 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Lesson4.Models;
 
-namespace Lesson4.Data
+using WebApplication;
+using WebApplication.Pages;
+
+namespace WebApplication
 {
     public class ToDoJSONData : ITodoData
     {
@@ -65,6 +67,20 @@ namespace Lesson4.Data
             ToDo toRemove = ToDos.First(t => t.TodoId == todoId);
             ToDos.Remove(toRemove);
             WriteTodosToFile();
+        }
+
+        public void Update(ToDo todo)
+        {
+            //instead of if statemnt
+            ToDo toTupdate = ToDos.First(t => t.TodoId == todo.TodoId);
+            toTupdate.IsCompleted = todo.IsCompleted;
+            toTupdate.Title = todo.Title;
+            WriteTodosToFile();
+        }
+
+        public ToDo Get(int id)
+        {
+            return ToDos.FirstOrDefault(t => t.TodoId == id);
         }
     }
 }

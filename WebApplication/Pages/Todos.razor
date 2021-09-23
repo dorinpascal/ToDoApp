@@ -1,16 +1,34 @@
 ﻿@page "/Todos"
-@using Lesson4.Models
-@using Lesson4.Data
+@using WebApplication
+
+
 @inject ITodoData TodoData
+@inject NavigationManager NavMgr
 <h1>Todos</h1>
 
-@if (todos == null)
+<p>
+
+    Filter by User Id: <input type="number" @oninput="@((arg) => FilterById(arg))" style="width:50px"/>
+</p>
+
+<p>
+    Filter by completed status:
+    <select class="form-control selectpicker" @onchange="@((arg) => FilterByStatus(arg))"style="width: 50px">
+        <option>Both</option>
+        <option>False</option>
+        <option>True</option>
+    </select>
+
+</p>
+
+
+@if (todosToShow == null)
 {
     <p>
         <em>Loading...</em>
     </p>
 }
-else if (!todos.Any())
+else if (!todosToShow.Any())
 {
     <p>
         <em>No ToDo items exist. Please add some.</em>
@@ -21,18 +39,28 @@ else
     <table class="table">
         <thead>
         <tr>
-            <th>User ID</th> <th>Todo ID</th> <th>Title</th> <th>Completed?</th><th>Remove</th>
+            <th>User ID</th> <th>Todo ID</th> <th>Title</th> <th>Completed?</th><th>Remove</th><th>Edit</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var item in todos)
+        @foreach (var item in todosToShow)
         {
             <tr>
-                <td>@item.UserId</td> <td>@item.TodoId</td> <td>@item.Title</td> <td>@item.IsCompleted</td>
+                <td>@item.UserId</td> <td>@item.TodoId</td> <td>@item.Title</td>
                 <td>
-                <button @onclick="@(() => RemoveTodo(item.TodoId))">
-                    <i class="oi oi-trash" style="color: red"/>
-                </button>
+
+                    <input type="checkbox" checked=@item.IsCompleted @onchange="@((arg) => CompletedChange(arg, item))"/>
+                </td>
+                <td>
+                    <button @onclick="@(() => RemoveTodo(item.TodoId))">
+                        <i class="oi oi-trash" style="color: red"/>
+                    </button>
+                </td>
+                <td>
+                    <button @onclick="@(() => Edit(item.TodoId))">
+                        <i class="oi oi-pencil" style="color:#1b6ec2"/>
+                    </button>
+                    
                 </td>
             </tr>
         }
@@ -43,18 +71,70 @@ else
 
 @code {
 
-    private IList<ToDo> todos;
+    private IList<ToDo> todosToShow;
+    private IList<ToDo> allTodos;
+    private int? filterById = null;
+    private bool? filterByIsCompleted;
 
     protected override async Task OnInitializedAsync()
     {
-        todos = TodoData.GetTodos();
+        allTodos = TodoData.GetTodos();
+        todosToShow = allTodos;
     }
 
     private void RemoveTodo(int todoId)
     {
-        ToDo todoToRemove = todos.First(t => t.TodoId == todoId);
+        ToDo todoToRemove = allTodos.First(t => t.TodoId == todoId);
         TodoData.RemoveTodo(todoId);
-        todos.Remove(todoToRemove);
+        allTodos.Remove(todoToRemove);
+        todosToShow.Remove(todoToRemove);
+    }
+
+    private void CompletedChange(ChangeEventArgs evt, ToDo toDo)
+    {
+        toDo.IsCompleted = (bool) evt.Value;
+        TodoData.Update(toDo);
+    }
+
+    private void FilterById(ChangeEventArgs evt)
+    {
+        filterById = null;
+        try
+        {
+            filterById = int.Parse(evt.Value.ToString());
+        }
+        catch (Exception e)
+        {
+        }
+        ExecuteFilter();
+       
+    }
+
+    private void FilterByStatus(ChangeEventArgs evt)
+    {
+        filterByIsCompleted = null;
+        try
+        {
+            filterByIsCompleted = bool.Parse(evt.Value.ToString());
+        }
+        catch (Exception e)
+        {
+        }
+        ExecuteFilter();
+    }
+
+
+    private void ExecuteFilter()
+    {
+        todosToShow = allTodos.Where(t =>
+            (filterById != null && t.UserId == filterById || filterById == null) &&
+            (filterByIsCompleted != null && t.IsCompleted == filterByIsCompleted || filterByIsCompleted == null)).ToList();
+    }
+
+
+    private void Edit(int id)
+    {
+        NavMgr.NavigateTo($"Edit/{id}");
     }
 
 }

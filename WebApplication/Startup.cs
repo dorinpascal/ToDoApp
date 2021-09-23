@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Lesson4.Data;
+using WebApplication;
 
-namespace Lesson4
+namespace WebApplication
 {
     public class Startup
     {

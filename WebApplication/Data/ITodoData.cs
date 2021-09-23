@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Lesson4.Models;
+using WebApplication;
 
-namespace Lesson4.Data
+
+namespace WebApplication
 {
     public interface ITodoData
     {
         IList<ToDo> GetTodos();
         void AddTodo(ToDo toDo);
         void RemoveTodo(int todoId);
+        void Update(ToDo todo);
+        ToDo Get(int id);
     }
 }
